@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salesforce Messaging for Web</title>
+</head>
+<body>
+    <h1>Test Site of Salesforce Messaging for Web</h1>
+
+    <script type="text/javascript">
+        const userFirstName = 'Junior';
+        const userLastName = 'Adenilson';
+        const userEmail = 'adenilsonj@ciandt.com';
+        const hasPreQualification = 'true';
+        const userSubject = 'Shop';
+        const isLoggedIn = true;
+
+        // Quando o MIAW estiver pronto, configuramos os campos do pré-chat
+        window.addEventListener("onEmbeddedMessagingReady", () => {
+            console.log("Embedded Messaging is ready");
+
+            embeddedservice_bootstrap.prechatAPI.setVisiblePrechatFields({
+                "_firstName": {
+                    "value": userFirstName,
+                    "isEditableByEndUser": false
+                },
+                "_lastName": {
+                    "value": userLastName,
+                    "isEditableByEndUser": false
+                },
+                "_email": {
+                    "value": userEmail,
+                    "isEditableByEndUser": false
+                },
+                "PreQualificationState": {
+                    "value": hasPreQualification,
+                    "isEditableByEndUser": false
+                },
+                "_subject": {
+                    "value": userSubject,
+                    "isEditableByEndUser": false
+                },
+                // Ainda preenchemos localmente para fallback
+                "UrlWhereOpenChat": {
+                    "value": window.location.href,
+                    "isEditableByEndUser": false
+                }
+            });
+
+            console.log("Pre-chat fields configured.");
+
+            // Enviamos a URL para dentro do iframe (onde está o LWC)
+            const iframe = document.querySelector('iframe');
+            if (iframe && iframe.contentWindow) {
+                iframe.contentWindow.postMessage({
+                    type: "PAGE_URL",
+                    url: window.location.href
+                }, '*');
+            }
+
+            console.log("URL sent via postMessage to MIAW iframe.");
+        });
+
+        // Carrega o script do Salesforce e inicializa o chat
+        window.onload = function () {
+            console.log("Loading Messaging bootstrap script...");
+            const script = document.createElement("script");
+            script.src = "https://freewaycrm--dev.sandbox.my.site.com/ESWChatDriveWayMessagin1739545676993/assets/js/bootstrap.min.js";
+            script.onload = function () {
+                console.log("Messaging script loaded.");
+                initEmbeddedMessaging();
+            };
+            document.body.appendChild(script);
+        };
+
+        function initEmbeddedMessaging() {
+            try {
+                embeddedservice_bootstrap.settings.language = "en_US";
+                embeddedservice_bootstrap.init(
+                    '00D8L0000008go1',
+                    'Chat_DriveWay_Messaging_LocalHostPublished',
+                    'https://freewaycrm--dev.sandbox.my.site.com/ESWChatDriveWayMessagin1741604224998',
+                    {
+                        scrt2URL: 'https://freewaycrm--dev.sandbox.my.salesforce-scrt.com'
+                    }
+                );
+                console.log("MIAW initialized successfully.");
+            } catch (err) {
+                console.error("Error initializing Embedded Messaging:", err);
+            }
+        }
+    </script>
+</body>
+</html>

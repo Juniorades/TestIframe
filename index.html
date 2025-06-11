@@ -53,6 +53,27 @@
     }
   </script>
 
+  <script>
+  function sendPageUrlToIframe() {
+    const iframe = document.querySelector('iframe.embeddedMessagingFrame');
+    if (iframe && iframe.contentWindow) {
+      iframe.contentWindow.postMessage({
+        type: 'PAGE_URL',
+        url: window.location.href
+      }, '*');
+      console.log('[Site] URL enviada para o iframe do MIAW:', window.location.href);
+    } else {
+      setTimeout(sendPageUrlToIframe, 500);
+    }
+  }
+
+  // Tenta enviar a URL logo após carregar o chat
+  window.addEventListener('load', () => {
+    setTimeout(sendPageUrlToIframe, 1000);
+  });
+</script>
+
+
   <script
     type="text/javascript"
     src="https://freewaycrm--citjr.sandbox.my.site.com/ESWTestIframe1749654605259/assets/js/bootstrap.min.js"
